@@ -1,4 +1,40 @@
 #include "Engine.h"
+#include "Input.h"
+#include "Core.h"
+
+
+// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
+Engine* Engine::instance = nullptr;
+
+Engine& Engine::Get()
+{
+    return *instance;
+}
+
+Engine::Engine()
+{
+    instance = this;
+
+    m_pd3dDevice = nullptr;
+    m_pImmediateContext = nullptr;
+    m_pSwapChain = nullptr;
+    m_pRenderTargetView = nullptr;
+    m_pDepthStencilBuffer = nullptr;
+    m_pDepthStencilView = nullptr; 
+    m_pRasterState = nullptr;
+    m_pBlendState = nullptr;
+    m_hWnd = nullptr;
+    m_width = 0;
+    m_height = 0;
+    m_featureLevel = D3D_FEATURE_LEVEL_11_0;
+    
+    // InitD3D(m_hWnd, m_width, m_height); // ì œê±° - ìƒì„±ìžì—ì„œ í˜¸ì¶œí•˜ì§€ ì•ŠìŒ
+}
+
+Engine::~Engine()
+{
+    Release();
+}
 
 HRESULT Engine::InitD3D(HWND hWnd, int width, int height)
 {
@@ -22,11 +58,11 @@ HRESULT Engine::InitD3D(HWND hWnd, int width, int height)
     UINT createDeviceFlags = 0;
 
     HRESULT hr = D3D11CreateDeviceAndSwapChain(
-        nullptr,                    // ±âº» ¾î´ðÅÍ
-        D3D_DRIVER_TYPE_HARDWARE,   // ÇÏµå¿þ¾î ·»´õ¸µ
-        nullptr,                    // ¼ÒÇÁÆ®¿þ¾î ·»´õ¸µ ¾È¾¸
+        nullptr,                    // ê¸°ë³¸ ì–´ëŒ‘í„°
+        D3D_DRIVER_TYPE_HARDWARE,   // í•˜ë“œì›¨ì–´ ê°€ì†
+        nullptr,                    // ì†Œí”„íŠ¸ì›¨ì–´ ë Œë”ëŸ¬ ì‚¬ìš© ì•ˆí•¨
         createDeviceFlags,
-        nullptr, 0,                  // ÇÇÃ³ ·¹º§ ÁöÁ¤ ¾ÈÇÔ
+        nullptr, 0,                  // ê¸°ëŠ¥ ë ˆë²¨ ë°°ì—´ ì—†ìŒ
         D3D11_SDK_VERSION,
         &sd,
         &m_pSwapChain,
@@ -37,15 +73,18 @@ HRESULT Engine::InitD3D(HWND hWnd, int width, int height)
     if (FAILED(hr))
         return hr;
 
-    // ¹é¹öÆÛ °¡Á®¿À±â
+    // ë°±ë²„í¼ ê°€ì ¸ì˜¤ê¸°
     ID3D11Texture2D* pBackBuffer = nullptr;
     m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
 
-    // ·»´õÅ¸°Ù ºä »ý¼º
-    m_pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &m_pRenderTargetView);
-    pBackBuffer->Release();
+    // ë Œë”íƒ€ê²Ÿ ë·° ìƒì„±
+    if (pBackBuffer != nullptr)
+    {
+        m_pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &m_pRenderTargetView);
+        pBackBuffer->Release();
+    }
 
-    // ±íÀÌ ½ºÅÙ½Ç ¹öÆÛ »ý¼º
+    // ê¹Šì´ ìŠ¤í…ì‹¤ ë²„í¼ ìƒì„±
     D3D11_TEXTURE2D_DESC depthDesc = {};
     depthDesc.Width = width;
     depthDesc.Height = height;
@@ -57,12 +96,15 @@ HRESULT Engine::InitD3D(HWND hWnd, int width, int height)
     depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
     m_pd3dDevice->CreateTexture2D(&depthDesc, nullptr, &m_pDepthStencilBuffer);
-    m_pd3dDevice->CreateDepthStencilView(m_pDepthStencilBuffer, nullptr, &m_pDepthStencilView);
+    if (m_pDepthStencilBuffer != nullptr)
+    {
+        m_pd3dDevice->CreateDepthStencilView(m_pDepthStencilBuffer, nullptr, &m_pDepthStencilView);
+    }
 
-    // ·»´õÅ¸°Ù & ±íÀÌ ½ºÅÙ½Ç ¹ÙÀÎµù
+    // ë Œë”íƒ€ê²Ÿ & ê¹Šì´ ìŠ¤í…ì‹¤ ì„¤ì •
     m_pImmediateContext->OMSetRenderTargets(1, &m_pRenderTargetView, m_pDepthStencilView);
 
-    // ºäÆ÷Æ® ¼³Á¤
+    // ë·°í¬íŠ¸ ì„¤ì •
     m_viewport.TopLeftX = 0;
     m_viewport.TopLeftY = 0;
     m_viewport.Width = (FLOAT)width;
@@ -71,15 +113,66 @@ HRESULT Engine::InitD3D(HWND hWnd, int width, int height)
     m_viewport.MaxDepth = 1.0f;
     m_pImmediateContext->RSSetViewports(1, &m_viewport);
 
-    Init(); // Game¿¡¼­ ¿À¹ö¶óÀÌµåÇÑ Init È£Ãâ
+    // ì´ˆê¸°í™” ì™„ë£Œ í‘œì‹œ
+    m_isInitialized = true;
+
+    Init(); // Gameì—ì„œ ì˜¤ë²„ë¼ì´ë“œí•  Init í˜¸ì¶œ
 
     return S_OK;
 }
 
-VOID Engine::CleanUp()
+void Engine::Run()
 {
-    Release(); // Game¿¡¼­ ¿À¹ö¶óÀÌµåÇÑ Release È£Ãâ
+    // DirectXê°€ ì´ˆê¸°í™”ë˜ì§€ ì•Šì•˜ìœ¼ë©´ ê²Œìž„ ë£¨í”„ë¥¼ ì‹¤í–‰í•˜ì§€ ì•ŠìŒ
+    if (!m_isInitialized)
+    {
+        return;
+    }
 
+    // ì •ì  ë³€ìˆ˜ë¡œ íƒ€ì´ë¨¸ ì •ë³´ ìœ ì§€
+    static LARGE_INTEGER previousTime = {0};
+    static LARGE_INTEGER frequency = {0};
+    static bool timerInitialized = false;
+
+    // íƒ€ì´ë¨¸ ì´ˆê¸°í™” (í•œ ë²ˆë§Œ)
+    if (!timerInitialized)
+    {
+        QueryPerformanceFrequency(&frequency);
+        QueryPerformanceCounter(&previousTime);
+        timerInitialized = true;
+    }
+
+    // í˜„ìž¬ ì‹œê°„ ì¸¡ì •
+    LARGE_INTEGER currentTime;
+    QueryPerformanceCounter(&currentTime);
+
+    // ë¸íƒ€ íƒ€ìž„ ê³„ì‚°
+    float deltaTime = (currentTime.QuadPart - previousTime.QuadPart) / (float)frequency.QuadPart;
+
+    // íƒ€ê²Ÿ í”„ë ˆìž„ë ˆì´íŠ¸ ì„¤ì • (60FPS)
+    float targetFrameRate = 60.0f;
+    float oneFrameTime = 1.0f / targetFrameRate;
+
+    // í”„ë ˆìž„ ë ˆì´íŠ¸ ì œí•œ
+    if (deltaTime >= oneFrameTime)
+    {
+        // ìž…ë ¥ ì²˜ë¦¬
+        input.ProcessInput();
+
+        // ê²Œìž„ ì—…ë°ì´íŠ¸ ë° ë Œë”ë§
+        Update(deltaTime);
+        Render();
+
+        // ì‹œê°„ ì—…ë°ì´íŠ¸
+        previousTime = currentTime;
+
+        // ì´ì „ í‚¤ ìƒíƒœ ì €ìž¥
+        input.SavePreviousKeyStates();
+    }
+}
+
+void Engine::Release()
+{
     if (m_pBlendState) m_pBlendState->Release();
     if (m_pRasterState) m_pRasterState->Release();
     if (m_pDepthStencilView) m_pDepthStencilView->Release();
@@ -88,20 +181,52 @@ VOID Engine::CleanUp()
     if (m_pSwapChain) m_pSwapChain->Release();
     if (m_pImmediateContext) m_pImmediateContext->Release();
     if (m_pd3dDevice) m_pd3dDevice->Release();
+
+    // í¬ì¸í„°ë“¤ì„ nullptrë¡œ ë¦¬ì…‹
+    m_pBlendState = nullptr;
+    m_pRasterState = nullptr;
+    m_pDepthStencilView = nullptr;
+    m_pDepthStencilBuffer = nullptr;
+    m_pRenderTargetView = nullptr;
+    m_pSwapChain = nullptr;
+    m_pImmediateContext = nullptr;
+    m_pd3dDevice = nullptr;
+
+    // ì´ˆê¸°í™” ìƒíƒœ ë¦¬ì…‹
+    m_isInitialized = false;
 }
 
-VOID Engine::RenderFrame()
+void Engine::Render()
 {
+    // DirectXê°€ ì´ˆê¸°í™”ë˜ì§€ ì•Šì•˜ìœ¼ë©´ ë Œë”ë§í•˜ì§€ ì•ŠìŒ
+    if (!m_isInitialized || !m_pImmediateContext || !m_pRenderTargetView || !m_pSwapChain)
+    {
+        return;
+    }
+
     FLOAT clearColor[4] = { 0.1f, 0.2f, 0.4f, 1.0f }; // RGBA
     m_pImmediateContext->ClearRenderTargetView(m_pRenderTargetView, clearColor);
-    m_pImmediateContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
-
-    Render(); // Game¿¡¼­ ¿À¹ö¶óÀÌµåÇÑ Render È£Ãâ
+    
+    if (m_pDepthStencilView)
+    {
+        m_pImmediateContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+    }
 
     m_pSwapChain->Present(1, 0);
+}   
+
+void Engine::Update(float deltaTime)
+{
+
 }
 
-void Engine::TickFrame()
+void Engine::Quit()
 {
-    Update(); // Game¿¡¼­ ¿À¹ö¶óÀÌµåÇÑ Update È£Ãâ
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    isQuit = true;
+}
+
+void Engine::Init()
+{
+    
 }

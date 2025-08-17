@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로젝트 관리 - RenderEngine</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>RenderEngine 프로젝트 관리</h1>
+            <nav>
+                <ul>
+                    <li><a href="#overview">개요</a></li>
+                    <li><a href="#tasks">작업 목록</a></li>
+                    <li><a href="#progress">진행률</a></li>
+                    <li><a href="#files">파일 관리</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <section id="overview">
+                <h2>프로젝트 개요</h2>
+                <div class="project-info">
+                    <div class="info-card">
+                        <h3>프로젝트명</h3>
+                        <p>RenderEngine</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>유형</h3>
+                        <p>C++ 렌더링 엔진</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>상태</h3>
+                        <p>개발 중</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tasks">
+                <h2>작업 목록</h2>
+                <div class="task-controls">
+                    <button id="add-task-btn">새 작업 추가</button>
+                    <select id="filter-status">
+                        <option value="all">모든 작업</option>
+                        <option value="todo">할 일</option>
+                        <option value="in-progress">진행 중</option>
+                        <option value="done">완료</option>
+                    </select>
+                </div>
+                <div id="task-list">
+                    <div class="task-item" data-status="done">
+                        <div class="task-checkbox">
+                            <input type="checkbox" checked>
+                        </div>
+                        <div class="task-content">
+                            <h4>DX11 엔진 빌드 자동화</h4>
+                            <p>빌드 시스템 설정 및 자동화 완료</p>
+                            <span class="task-date">2024-08-17</span>
+                        </div>
+                        <div class="task-status done">완료</div>
+                    </div>
+                    <div class="task-item" data-status="in-progress">
+                        <div class="task-checkbox">
+                            <input type="checkbox">
+                        </div>
+                        <div class="task-content">
+                            <h4>입력 시스템 구현</h4>
+                            <p>키보드/마우스 입력 처리 시스템 개발</p>
+                            <span class="task-date">2024-08-17</span>
+                        </div>
+                        <div class="task-status in-progress">진행 중</div>
+                    </div>
+                    <div class="task-item" data-status="todo">
+                        <div class="task-checkbox">
+                            <input type="checkbox">
+                        </div>
+                        <div class="task-content">
+                            <h4>렌더링 파이프라인 최적화</h4>
+                            <p>성능 향상을 위한 렌더링 최적화</p>
+                            <span class="task-date">2024-08-17</span>
+                        </div>
+                        <div class="task-status todo">할 일</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="progress">
+                <h2>진행률</h2>
+                <div class="progress-section">
+                    <div class="progress-card">
+                        <h3>전체 진행률</h3>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%"></div>
+                        </div>
+                        <span class="progress-text">45%</span>
+                    </div>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-number">3</span>
+                            <span class="stat-label">총 작업</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">1</span>
+                            <span class="stat-label">완료</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">1</span>
+                            <span class="stat-label">진행 중</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">1</span>
+                            <span class="stat-label">예정</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="files">
+                <h2>파일 관리</h2>
+                <div class="file-tree">
+                    <div class="folder">
+                        <span class="folder-icon">📁</span>
+                        <span class="folder-name">Application</span>
+                        <div class="folder-content">
+                            <div class="file">
+                                <span class="file-icon">📄</span>
+                                <span class="file-name">Game.cpp</span>
+                                <span class="file-status modified">수정됨</span>
+                            </div>
+                            <div class="file">
+                                <span class="file-icon">📄</span>
+                                <span class="file-name">Game.h</span>
+                                <span class="file-status modified">수정됨</span>
+                            </div>
+                            <div class="file">
+                                <span class="file-icon">📄</span>
+                                <span class="file-name">main.cpp</span>
+                                <span class="file-status modified">수정됨</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="folder">
+                        <span class="folder-icon">📁</span>
+                        <span class="folder-name">Engine</span>
+                        <div class="folder-content">
+                            <div class="file">
+                                <span class="file-icon">📄</span>
+                                <span class="file-name">Engine.cpp</span>
+                                <span class="file-status modified">수정됨</span>
+                            </div>
+                            <div class="file">
+                                <span class="file-icon">📄</span>
+                                <span class="file-name">Input.cpp</span>
+                                <span class="file-status new">새 파일</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 작업 추가 모달 -->
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>새 작업 추가</h3>
+            <form id="task-form">
+                <div class="form-group">
+                    <label for="task-title">제목:</label>
+                    <input type="text" id="task-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-description">설명:</label>
+                    <textarea id="task-description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="task-priority">우선순위:</label>
+                    <select id="task-priority">
+                        <option value="low">낮음</option>
+                        <option value="medium" selected>보통</option>
+                        <option value="high">높음</option>
+                    </select>
+                </div>
+                <div class="form-buttons">
+                    <button type="submit">추가</button>
+                    <button type="button" id="cancel-btn">취소</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

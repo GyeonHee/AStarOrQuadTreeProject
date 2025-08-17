@@ -56,10 +56,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
         }
         else
         {
-            game.TickFrame();    // Update 호출
-            game.RenderFrame();  // Render + Present 호출
+            game.Run();
         }
     }
-    game.CleanUp(); // 리소스 해제
     return (int)msg.wParam;
 }
