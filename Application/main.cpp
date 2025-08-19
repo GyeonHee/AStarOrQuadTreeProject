@@ -1,22 +1,26 @@
-// Win32 API¸¦ »ç¿ëÇÏ±â À§ÇØ include.
+// Win32 APIë¥¼ ì‚¬ìš©í•˜ê¸° ìœ„í•œ include.
 #include <Windows.h>
 #include "Game/Game.h"
 
-HWND hWnd;
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 600
 
-// Ã¢¿¡¼­ ¸Þ½ÃÁö°¡ ¹ß»ýÇÏ¸é È£ÃâµÉ ÇÔ¼ö.
+HWND hWnd;
+Game game;
+
+// Ã¢ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½ï¿½Ï¸ï¿½ È£ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½.
 LRESULT WINAPI WindowProc(HWND hwnd, unsigned int message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
-        // Ã¢ÀÌ »èÁ¦µÇ¸é ¹ß»ýÇÏ´Â ¸Þ½ÃÁö.
+        // Ã¢ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç¸ï¿½ ï¿½ß»ï¿½ï¿½Ï´ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½.
     case WM_DESTROY:
-        // ÇÁ·Î±×·¥ Á¾·á ¸Þ½ÃÁö ¹ß»ý½ÃÅ°±â.
+        // ï¿½ï¿½ï¿½Î±×·ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½ï¿½ï¿½Å°ï¿½ï¿½.
         PostQuitMessage(0);
         break;
     }
 
-    // ³ª¸ÓÁö ¸Þ½ÃÁö´Â À©µµ¿ì ±âº» ¼³Á¤À¸·Î Ã³¸®.
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½âº» ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½.
     return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
@@ -24,40 +28,92 @@ LRESULT WINAPI WindowProc(HWND hwnd, unsigned int message, WPARAM wParam, LPARAM
 // Name: wWinMain()
 // Desc: The application's entry point
 //-----------------------------------------------------------------------------
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
+//int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
+//{
+//    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+//    WNDCLASSEX wc = { sizeof(WNDCLASSEX) };
+//    wc.style = CS_HREDRAW | CS_VREDRAW;
+//    wc.lpfnWndProc = WindowProc;
+//    wc.hInstance = hInstance;
+//    wc.lpszClassName = L"MyWindowClass";
+//    RegisterClassEx(&wc);
+//
+//    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+//    HWND hWnd = CreateWindow(L"MyWindowClass", L"DX11 Engine",
+//        WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
+//        1280, 720, nullptr, nullptr, hInstance, nullptr);
+//
+//    ShowWindow(hWnd, nCmdShow);
+//
+//    Game game;
+//    if (FAILED(game.InitD3D(hWnd, 1280, 720)))
+//        return 0;
+//
+//    
+//    MSG msg = {};
+//    while (msg.message != WM_QUIT)
+//    {
+//        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+//        {
+//            TranslateMessage(&msg);
+//            DispatchMessage(&msg);
+//        }
+//        else
+//        {
+//            game.Run();
+//        }
+//    }
+//    
+//    return (int)msg.wParam;
+//}
+
+INT WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT)
 {
-    // À©µµ¿ì Å¬·¡½º µî·Ï
-    WNDCLASSEX wc = { sizeof(WNDCLASSEX) };
-    wc.style = CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc = WindowProc;
-    wc.hInstance = hInstance;
-    wc.lpszClassName = L"MyWindowClass";
+    UNREFERENCED_PARAMETER(hInst);
+
+    // Register the window class
+    WNDCLASSEX wc =
+    {
+        sizeof(WNDCLASSEX), CS_CLASSDC, WindowProc, 0L, 0L,
+        GetModuleHandle(NULL), NULL, NULL, NULL, NULL,
+        L"DirectX11", NULL
+    };
     RegisterClassEx(&wc);
 
-    // À©µµ¿ì »ý¼º
-    HWND hWnd = CreateWindow(L"MyWindowClass", L"DX11 Engine",
-        WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
-        1280, 720, nullptr, nullptr, hInstance, nullptr);
+    // Create the application's window
+    hWnd = CreateWindow(L"DirectX11", L"DX11 Engine",
+        WS_OVERLAPPEDWINDOW, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
+        NULL, NULL, wc.hInstance, NULL);
 
-    ShowWindow(hWnd, nCmdShow);
-
-    Game game;
-    if (FAILED(game.InitD3D(hWnd, 1280, 720)))
-        return 0;
-
-    // ¸Þ½ÃÁö ·çÇÁ
-    MSG msg = {};
-    while (msg.message != WM_QUIT)
+    // Initialize Direct3D    
+    if (SUCCEEDED(game.InitD3D(hWnd, SCREEN_WIDTH, SCREEN_HEIGHT)))
     {
-        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+        // Initialize game resources
+        game.Init();
+        
+        // Show the window
+        ShowWindow(hWnd, SW_SHOWDEFAULT);
+        UpdateWindow(hWnd);
+
+        // Enter the message loop
+        MSG msg;
+        while (1)
         {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-        else
-        {
-            game.Run();
+            if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+            {
+                if (msg.message == WM_QUIT)
+                    break;
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+            else
+            {
+                game.Update();
+                game.Render();
+            }
         }
     }
-    return (int)msg.wParam;
+
+    UnregisterClass(L"DirectX11", wc.hInstance);
+    return 0;
 }

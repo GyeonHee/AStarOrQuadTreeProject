@@ -1,47 +1,40 @@
-	// BeginPlay í˜¸ì¶œ ì—¬ë¶€ í™•ì¸
-	inline bool HasInit() const { return hasInit; }
+#pragma once
 
-	// ì˜¤ë„ˆì‹­ ì„¤ì • (ì„ì‹œ ì£¼ì„ ì²˜ë¦¬)
-	// void SetOwner(Level* newOwner);
-	// Level* GetOwner();
+#include "Core.h"
+#include "RTTI.h"
+
+class Level;
+class Engine_API Actor : public RTTI
+{
+	friend class Level;
+	RTTI_DECLARATIONS(Actor, RTTI)
+public:
+	Actor();
+	virtual ~Actor();
+
+private:
+	virtual void Init();
+	virtual void Update();
+	virtual void Render();
+
+	void SetLevel(Level* level);
+	Level* GetLevel() const;
+
+	void Destroy();
+
+	// BeginPlay È£Ãâ ¿©ºÎ È®ÀÎ
+	inline bool HasBegunPlay() const { return hasBegunPlay; }
 
 protected:
-	// ì›”ë“œ í–‰ë ¬ ê³„ì‚°
-	DirectX::XMMATRIX CalculateWorldMatrix();
+    // ¿À³Ê½Ê ¼³Á¤
+	Level* m_level = nullptr;
 
-	// ë³€í™˜ ì†ì„±
-	DirectX::XMFLOAT3 m_position;
-	DirectX::XMFLOAT3 m_rotation;
-	DirectX::XMFLOAT3 m_scale;
-
-	// ë Œë”ë§ ê´€ë ¨
-	//ID3D11Buffer* m_pVertexBuffer;
-	ID3D11Buffer* m_pVertexBuffer;
-    ID3D11Buffer* m_pIndexBuffer;
-    ID3D11Buffer* m_pCB;
-    ID3D11InputLayout* m_pInputLayout;
-    ID3D11VertexShader* m_pVS;
-    ID3D11PixelShader* m_pPS;
-
-    // ìƒ‰ìƒ ì†ì„±
-    DirectX::XMFLOAT4 m_color;
-
-	// D3D11 ë””ë°”ì´ìŠ¤ ì ‘ê·¼ì„ ìœ„í•œ í¬ì¸í„°ë“¤
-	ID3D11Device* m_pd3dDevice;
-	ID3D11DeviceContext* m_pImmediateContext;
-	int m_width;
-	int m_height;
-
-	// Init í˜¸ì¶œì´ ë˜ì—ˆëŠ”ì§€ í™•ì¸
-	bool hasInit = false;
-
-	// ì•¡í„°ê°€ í™œì„± ìƒíƒœì¸ì§€ ì•Œë ¤ì£¼ëŠ” ë³€ìˆ˜
-	//bool isActive = true;
+	// ¾×ÅÍ°¡ È°¼º »óÅÂÀÎÁö ¾Ë·ÁÁÖ´Â º¯¼ö
 	bool isActive = true;
 
-	// ì‚­ì œ ìš”ì²­ëëŠ”ì§€ ì•Œë ¤ì£¼ëŠ” ë³€ìˆ˜
-	//bool isExpired = false;
+	// »èÁ¦ ¿äÃ»µÆ´ÂÁö ¾Ë·ÁÁÖ´Â º¯¼ö
 	bool isExpired = false;
 
-	// ì†Œìœ  ë ˆë²¨(ì˜¤ë„ˆì‹­) (ì„ì‹œ ì£¼ì„ ì²˜ë¦¬)
-	// Level* owner = nullptr;
+	// BeginPlay È£ÃâÀÌ µÇ¾ú´ÂÁö È®ÀÎ
+	bool hasBegunPlay = false;
+};

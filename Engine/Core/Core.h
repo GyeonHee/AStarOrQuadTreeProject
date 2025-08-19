@@ -52,3 +52,13 @@ void SafeDeleteArray(T*& target)
 		target = nullptr;
 	}
 }
+
+template<typename T>
+void SafeRelease(T*& target)
+{
+	if (target != nullptr)
+	{
+		target->Release();
+		target = nullptr;
+	}
+}
