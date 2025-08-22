@@ -1,55 +1,54 @@
 #pragma once
 #include "Core.h"
+#include "Window.h"
 #include "Input.h"
 
 
+class Level;
 class Engine_API Engine
 {
 public:
-    Engine();
+    Engine(/*const wchar_t* windowName, unsigned int width, unsigned int height*/);
     virtual ~Engine();
-
-    HRESULT InitD3D(HWND hWnd, int width, int height);
 
     static Engine& Get();
 
-    bool IsInitialized() const { return m_isInitialized; }
+    //HRESULT InitD3D(HWND hWnd, int width, int height);
+    virtual void Run();
 
-protected:
-    virtual void Init() = 0;
-    virtual void Update() = 0;
-    virtual void Render() = 0;
-    virtual void Release() = 0;
-
-protected:
-    // =======================================================
-    // DX11 �ʼ� ��ü
-    ID3D11Device* m_pd3dDevice;
-    ID3D11DeviceContext* m_pImmediateContext;
-    IDXGISwapChain* m_pSwapChain;
-    ID3D11RenderTargetView* m_pRenderTargetView;
-
-    // DepthStencil (3D�� �ʼ�)
-    ID3D11DepthStencilView* m_pDepthStencilView;
-
-    // ���� ��ü
-    ID3D11RasterizerState* m_pRasterState;
-    ID3D11BlendState* m_pBlendState;
-
-    // ����Ʈ
-    D3D11_VIEWPORT            m_viewport;
-    D3D_FEATURE_LEVEL         m_featureLevel;
-
-    // â ����
-    HWND                      m_hWnd;
-    int                       m_width;
-    int                       m_height;
-
-    bool                      m_isInitialized;
-
-protected:
-    Input input;
+    ID3D11Device* GetDevice() { return device; }
+    ID3D11DeviceContext* GetContext() { return context; }
+    ID3D11RenderTargetView* GetRenderTargetView() { return renderTargetView; }
+    ID3D11RenderTargetView* const* GetRefRenderTargetView() { return &renderTargetView; }
 
 private:
+    void RenderFrame();
+
+protected:
     static Engine* instance;
+    Input input;
+    Window* window = nullptr;
+
+    // =======================================================
+
+    ID3D11Device* device = nullptr;
+    ID3D11DeviceContext* context = nullptr;
+    IDXGISwapChain* swapChain = nullptr;
+    ID3D11RenderTargetView* renderTargetView = nullptr;
+
+    // DepthStencil (3D쓰려면 필수)
+    ID3D11DepthStencilView* depthStencilView = nullptr;
+    ID3D11Texture2D* depthStencilBuffer = nullptr;
+
+    // 뷰포트 설정
+    D3D11_VIEWPORT            viewport;
+    D3D_FEATURE_LEVEL         featureLevel;
+
+    ID3D11RasterizerState* rasterState = nullptr; // 폴리곤의 모양 / 뒷면 제거 / 깊이 클리핑 결정
+    ID3D11BlendState* blendState = nullptr;       // 픽셀 색상 합성(투명도, 알파 블렌딩) 결정
+
+    // =======================================================
+
+    // 메인 레벨
+    Level* mainLevel = nullptr;
 };

@@ -1,145 +1,91 @@
 #include "Game.h"
-#include <d3dcompiler.h>
+#include "Actor/Player.h"
 
 Game::Game()
-    : m_pVertexBuffer(nullptr),
-    m_pVertexShader(nullptr),
-    m_pPixelShader(nullptr),
-    m_pInputLayout(nullptr)
 {
+    mainLevel = new Level();
+    Player* player = new Player();
+    mainLevel->AddActor(player);
 }
 
-Game::~Game() 
+Game::~Game()
 {
-    Release();
+    delete mainLevel;
 }
 
 void Game::Init()
 {
-    const char* vertexShaderSource = R"(
-struct VS_INPUT
-{
-    float3 pos : POSITION;
-    float4 color : COLOR;
-};
-
-struct VS_OUTPUT
-{
-    float4 pos : SV_POSITION;
-    float4 color : COLOR;
-};
-
-VS_OUTPUT main(VS_INPUT input)
-{
-    VS_OUTPUT output;
-    output.pos = float4(input.pos, 1.0f);
-    output.color = input.color;
-    return output;
-}
-)";
-
-    const char* pixelShaderSource = R"(
-struct PS_INPUT
-{
-    float4 pos : SV_POSITION;
-    float4 color : COLOR;
-};
-
-float4 main(PS_INPUT input) : SV_TARGET
-{
-    return input.color;
-}
-)";
-
-    ID3DBlob* pVSBlob = nullptr;
-    ID3DBlob* pErrorBlob = nullptr;
-    
-    HRESULT hr = D3DCompile(vertexShaderSource, strlen(vertexShaderSource), nullptr, nullptr, nullptr,
-        "main", "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS, 0, &pVSBlob, &pErrorBlob);
-    
-    if (FAILED(hr))
+    if (mainLevel)
     {
-        if (pErrorBlob) pErrorBlob->Release();
-        return;
+        mainLevel->ProcessAddAndDestroyActors();
+        mainLevel->OnInit();
+    }
+}
+
+void Game::Run()
+{
+    LARGE_INTEGER frequency = {};
+    QueryPerformanceFrequency(&frequency);
+
+    LARGE_INTEGER currentTime = {};
+    QueryPerformanceCounter(&currentTime);
+    LARGE_INTEGER previousTime = currentTime;
+
+    float targetFrameTime = 120.0f;
+    float oneFrameTime = 1.0f / targetFrameTime;
+
+    MSG message = {};
+    while (message.message != WM_QUIT)
+    {
+        if (PeekMessage(&message, nullptr, 0, 0, PM_REMOVE))
+        {
+            TranslateMessage(&message);
+            DispatchMessage(&message);
+        }
+        else
+        {
+            QueryPerformanceCounter(&currentTime);
+
+            float deltaTime =
+                static_cast<float>(currentTime.QuadPart - previousTime.QuadPart)
+                / static_cast<float>(frequency.QuadPart);
+
+            if (deltaTime >= oneFrameTime)
+            {
+                // FPS 표시
+                char buffer[256] = {};
+                sprintf_s(buffer, 256, "DirectX_11 | FPS: %d", static_cast<int>(ceil(1.0f / deltaTime)));
+                SetWindowTextA(window->handle, buffer);  // window 접근을 위해 protected로 변경 필요
+
+                // Game만의 렌더링 로직
+                GameRenderFrame();
+
+                // Level 업데이트
+                if (mainLevel)
+                {
+                    mainLevel->ProcessAddAndDestroyActors();
+                }
+
+                previousTime = currentTime;
+            }
+        }
+    }
+}
+
+void Game::GameRenderFrame()
+{
+    // 1. 화면 지우기
+    float clearColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
+    GetContext()->ClearRenderTargetView(GetRenderTargetView(), clearColor);
+    GetContext()->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);  // 추가
+    // DepthStencil 접근을 위해 Engine의 멤버를 protected로 변경 필요
+
+    // 2. Level 렌더링
+    if (mainLevel)
+    {
+        mainLevel->OnRender();
     }
 
-    hr = m_pd3dDevice->CreateVertexShader(pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(),
-        nullptr, &m_pVertexShader);
-
-    D3D11_INPUT_ELEMENT_DESC layout[] =
-    {
-        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-    };
-    
-    UINT numElements = ARRAYSIZE(layout);
-    hr = m_pd3dDevice->CreateInputLayout(layout, numElements, pVSBlob->GetBufferPointer(),
-        pVSBlob->GetBufferSize(), &m_pInputLayout);
-    
-    pVSBlob->Release();
-
-    ID3DBlob* pPSBlob = nullptr;
-    hr = D3DCompile(pixelShaderSource, strlen(pixelShaderSource), nullptr, nullptr, nullptr,
-        "main", "ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS, 0, &pPSBlob, &pErrorBlob);
-    
-    if (FAILED(hr))
-    {
-        if (pErrorBlob) pErrorBlob->Release();
-        return;
-    }
-
-    hr = m_pd3dDevice->CreatePixelShader(pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(),
-        nullptr, &m_pPixelShader);
-    
-    pPSBlob->Release();
-
-    Vertex vertices[] =
-    {
-        { 0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f },  // Top - Red
-        { 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f },  // Bottom Right - Green
-        {-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f }   // Bottom Left - Blue
-    };
-
-    D3D11_BUFFER_DESC bd = {};
-    bd.Usage = D3D11_USAGE_DEFAULT;
-    bd.ByteWidth = sizeof(vertices);
-    bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    bd.CPUAccessFlags = 0;
-
-    D3D11_SUBRESOURCE_DATA InitData = {};
-    InitData.pSysMem = vertices;
-
-    hr = m_pd3dDevice->CreateBuffer(&bd, &InitData, &m_pVertexBuffer);
-}
-
-void Game::Update()
-{
-}
-
-void Game::Render()
-{
-    float clearColor[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
-    m_pImmediateContext->ClearRenderTargetView(m_pRenderTargetView, clearColor);
-    m_pImmediateContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
-
-    UINT stride = sizeof(Vertex);
-    UINT offset = 0;
-    m_pImmediateContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
-    m_pImmediateContext->IASetInputLayout(m_pInputLayout);
-    m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-    m_pImmediateContext->VSSetShader(m_pVertexShader, nullptr, 0);
-    m_pImmediateContext->PSSetShader(m_pPixelShader, nullptr, 0);
-
-    m_pImmediateContext->Draw(3, 0);
-
-    m_pSwapChain->Present(0, 0);
-}
-
-void Game::Release()
-{
-    if (m_pVertexBuffer) { m_pVertexBuffer->Release(); m_pVertexBuffer = nullptr; }
-    if (m_pVertexShader) { m_pVertexShader->Release(); m_pVertexShader = nullptr; }
-    if (m_pPixelShader) { m_pPixelShader->Release(); m_pPixelShader = nullptr; }
-    if (m_pInputLayout) { m_pInputLayout->Release(); m_pInputLayout = nullptr; }
+    // 3. 최종 출력 - swapChain 접근을 위해 protected 필요
+    swapChain->Present(0, 0);
 }
