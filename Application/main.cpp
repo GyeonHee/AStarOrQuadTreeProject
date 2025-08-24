@@ -10,7 +10,7 @@ int APIENTRY wWinMain(
 	LPWSTR lpCmdLine,
 	int nCmdShow)
 {
-	//// ì—”ì§„ ê°ì²´ ìƒì„±.
+	//// ¿£Áø °´Ã¼ »ı¼º.
 	//Engine engine(L"DirectX_11", SCREEN_WIDTH, SCREEN_HEIGHT);
 	//engine.Run();
 

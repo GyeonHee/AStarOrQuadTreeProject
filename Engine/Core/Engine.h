@@ -20,6 +20,9 @@ public:
     ID3D11DeviceContext* GetContext() { return context; }
     ID3D11RenderTargetView* GetRenderTargetView() { return renderTargetView; }
     ID3D11RenderTargetView* const* GetRefRenderTargetView() { return &renderTargetView; }
+    HWND GetWindowHandle() { return window ? window->handle : nullptr; }
+    ID3D11DepthStencilView* GetDepthStencilView() { return depthStencilView; }
+    IDXGISwapChain* GetSwapChain() { return swapChain; }
 
 private:
     void RenderFrame();

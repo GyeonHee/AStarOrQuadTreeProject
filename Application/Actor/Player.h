@@ -1,12 +1,7 @@
 #pragma once
 
 #include "Actor/Actor.h"
-
-struct Vertex
-{
-    float x, y, z;
-    float r, g, b, a;
-};
+#include "../Common/Vertex.h"
 
 class Player : public Actor
 {
@@ -19,20 +14,20 @@ public:
     virtual void OnRender();
 
 private:
-    // DirectX ·»´õ¸µ ¸®¼Ò½º
+    // DirectX ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ò½ï¿½
     //ID3D11Buffer* vertexBuffer;
     ID3D11Buffer* vertexBuffer;
-    ID3D11VertexShader* vertexShader;    // Á¤Á¡ ¼ÎÀÌ´õ °´Ã¼.
+    ID3D11VertexShader* vertexShader;    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½ï¿½Ã¼.
     ID3D11PixelShader* pixelShader;
-    ID3D11InputLayout* inputLayout;      // Æ÷ÀÎÅÍ Á¤º¸ Àü´Þ.
+    ID3D11InputLayout* inputLayout;      // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
 
-    // Á¤Á¡ ¼ÎÀÌ´õ ÄÄÆÄÀÏ ÈÄ Á¤º¸ (c++ÀÇ obj¿Í °°À½).
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (c++ï¿½ï¿½ objï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½).
     ID3DBlob* vertexShaderBuffer = nullptr;
 
     //ID3D11PixelShader* pixelShader = nullptr;
     ID3DBlob* pixelShaderBuffer = nullptr;
     
-    // ·»´õ¸µ¿¡ ÇÊ¿äÇÑ DirectX ÄÁÅØ½ºÆ®
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½ï¿½ DirectX ï¿½ï¿½ï¿½Ø½ï¿½Æ®
     ID3D11Device* d3dDevice;
     ID3D11DeviceContext* immediateContext;
 };

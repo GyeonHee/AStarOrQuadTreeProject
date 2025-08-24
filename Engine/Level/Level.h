@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Core.h"
-#include <vector>	// Å©±â°¡ ¾Ë¾Æ¼­ º¯µ¿µÇ´Â µ¿Àû ¹è¿­
+#include <vector>	// Å©ï¿½â°¡ ï¿½Ë¾Æ¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½è¿­
 #include "RTTI.h"
+#include "Math/Vector3.h"
 
 class Actor;
 class Engine_API Level : public RTTI
@@ -12,27 +13,27 @@ public:
 	Level();
 	virtual ~Level();
 
-	// ·¹º§¿¡ ¾×ÅÍ¸¦ Ãß°¡ÇÒ ¶§ »ç¿ë
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ß°ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½
 	void AddActor(Actor* newActor);
 
-	// ¾×ÅÍ »èÁ¦ ÇÔ¼ö
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
 	void DestroyActor(Actor* destroyedActor);
 
-	// ¿£Áø ÀÌº¥Æ® ÇÔ¼ö
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½Ìºï¿½Æ® ï¿½Ô¼ï¿½
 	virtual void OnInit();
 	virtual void OnUpdate();
 	virtual void OnRender();
 
-	// Ãß°¡ ¹× »èÁ¦ ¿äÃ»µÈ ¾×ÅÍ¸¦ Ã³¸®ÇÏ´Â ÇÔ¼ö
+	// ï¿½ß°ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã»ï¿½ï¿½ ï¿½ï¿½ï¿½Í¸ï¿½ Ã³ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Ô¼ï¿½
 	void ProcessAddAndDestroyActors();
 
 protected:
-	// ·¹º§¿¡ ¹èÄ¡µÈ ¸ðµç ¾×ÅÍ¸¦ °ü¸®ÇÏ´Â ¹è¿­
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½è¿­
 	std::vector<Actor*> actors;
 
-	// Ãß°¡ ¿äÃ»µÈ ¾×ÅÍ¸¦ °ü¸®ÇÏ´Â ¹è¿­
+	// ï¿½ß°ï¿½ ï¿½ï¿½Ã»ï¿½ï¿½ ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½è¿­
 	std::vector<Actor*> addRequestedActors;
 
-	// »èÁ¦ ¿äÃ»µÈ ¾×ÅÍ¸¦ °ü¸®ÇÏ´Â ¹è¿­
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã»ï¿½ï¿½ ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½è¿­
 	std::vector<Actor*> destroyRequestedActors;
 };

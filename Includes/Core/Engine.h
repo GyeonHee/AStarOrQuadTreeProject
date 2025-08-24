@@ -20,6 +20,9 @@ public:
     ID3D11DeviceContext* GetContext() { return context; }
     ID3D11RenderTargetView* GetRenderTargetView() { return renderTargetView; }
     ID3D11RenderTargetView* const* GetRefRenderTargetView() { return &renderTargetView; }
+    HWND GetWindowHandle() { return window ? window->handle : nullptr; }
+    ID3D11DepthStencilView* GetDepthStencilView() { return depthStencilView; }
+    IDXGISwapChain* GetSwapChain() { return swapChain; }
 
 private:
     void RenderFrame();
@@ -36,19 +39,19 @@ protected:
     IDXGISwapChain* swapChain = nullptr;
     ID3D11RenderTargetView* renderTargetView = nullptr;
 
-    // DepthStencil (3Dì“°ë ¤ë©´ í•„ìˆ˜)
+    // DepthStencil (3D¾²·Á¸é ÇÊ¼ö)
     ID3D11DepthStencilView* depthStencilView = nullptr;
     ID3D11Texture2D* depthStencilBuffer = nullptr;
 
-    // ë·°í¬íŠ¸ ì„¤ì •
+    // ºäÆ÷Æ® ¼³Á¤
     D3D11_VIEWPORT            viewport;
     D3D_FEATURE_LEVEL         featureLevel;
 
-    ID3D11RasterizerState* rasterState = nullptr; // í´ë¦¬ê³¤ì˜ ëª¨ì–‘ / ë’·ë©´ ì œê±° / ê¹Šì´ í´ë¦¬í•‘ ê²°ì •
-    ID3D11BlendState* blendState = nullptr;       // í”½ì…€ ìƒ‰ìƒ í•©ì„±(íˆ¬ëª…ë„, ì•ŒíŒŒ ë¸”ë Œë”©) ê²°ì •
+    ID3D11RasterizerState* rasterState = nullptr; // Æú¸®°ïÀÇ ¸ğ¾ç / µŞ¸é Á¦°Å / ±íÀÌ Å¬¸®ÇÎ °áÁ¤
+    ID3D11BlendState* blendState = nullptr;       // ÇÈ¼¿ »ö»ó ÇÕ¼º(Åõ¸íµµ, ¾ËÆÄ ºí·»µù) °áÁ¤
 
     // =======================================================
 
-    // ë©”ì¸ ë ˆë²¨
+    // ¸ŞÀÎ ·¹º§
     Level* mainLevel = nullptr;
 };

@@ -1,5 +1,7 @@
 #pragma once
 #include "Level/Level.h"
+#include "../Common/Vertex.h"
+#include <vector>
 
 class GameLevel : public Level
 {
@@ -8,9 +10,26 @@ public:
 	GameLevel();
 	~GameLevel();
 
-	// ¿£Áø ÀÌº¥Æ® ÇÔ¼ö
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½Ìºï¿½Æ® ï¿½Ô¼ï¿½
 	virtual void OnInit() override;
 	virtual void OnUpdate() override;
 	virtual void OnRender() override;
 private:
+	// DirectX ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ò½ï¿½
+	ID3D11Buffer* gridVertexBuffer = nullptr;
+	ID3D11VertexShader* gridVertexShader = nullptr;
+	ID3D11PixelShader* gridPixelShader = nullptr;
+	ID3D11InputLayout* gridInputLayout = nullptr;
+
+	// ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	ID3DBlob* gridVertexShaderBuffer = nullptr;
+	ID3DBlob* gridPixelShaderBuffer = nullptr;
+
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½ï¿½ DirectX ï¿½ï¿½ï¿½Ø½ï¿½Æ®
+	ID3D11Device* d3dDevice = nullptr;
+	ID3D11DeviceContext* immediateContext = nullptr;
+
+	// ï¿½×¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	int gridSize = 10;
+	float gridSpacing = 1.0f;
 };
